@@ -10,6 +10,8 @@ namespace b.demo.database.Configurations
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.HasKey(u =>  u.Id);
+
+            builder.HasIndex(u => u.Email).IsUnique();
         }
     }
 }
