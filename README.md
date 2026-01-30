@@ -1,2 +1,5 @@
 # dualis
-# dotnet tool install --global dotnet-ef --version 8.0
+<pre>
+  dotnet tool install --global dotnet-ef --version 8.*
+</pre>
+
