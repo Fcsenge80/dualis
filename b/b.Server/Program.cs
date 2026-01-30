@@ -1,4 +1,6 @@
+using b.demo.database;
 using b.Server.Middleware;
+using Microsoft.EntityFrameworkCore;
 
 namespace b.Server
 {
@@ -21,7 +23,15 @@ namespace b.Server
 
             builder.Services.AddCors();
 
+            builder.Services.AddDbContext<CoreDbContext>(options => 
+                options.UseSqlite(builder.Configuration.GetConnectionString(nameof(CoreDbContext)))
+            );
+
             var app = builder.Build();
+
+            using var scope = app.Services.CreateScope();
+            using var coredbContext = scope.ServiceProvider.GetRequiredService<CoreDbContext>();
+            coredbContext.Database.Migrate();
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
