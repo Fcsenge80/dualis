@@ -3,6 +3,7 @@ import { Menu } from "../Menu/Menu";
 import { useAccessToken } from "../../hooks/useAccessToken";
 import { LoginForm } from "../LoginFrom/LoginForm";
 import { LogoutButton } from "../LogoutButton/LogoutButton";
+import { UserInfo } from "./UserInfo";
 
 export function Layout() {
   const { accessToken, isLoading } = useAccessToken();
@@ -28,6 +29,7 @@ export function Layout() {
                 justifyContent: "space-around",
               }}
             >
+              <UserInfo />
               {!accessToken ? <LoginForm /> : <LogoutButton />}
             </div>
           </div>
