@@ -1,5 +1,7 @@
 using b.demo.database;
 using b.Server.Middleware;
+using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace b.Server
@@ -15,6 +17,10 @@ namespace b.Server
 
             builder.Services
                 .AddAuthenticationServices (builder.Configuration);
+
+            MapsterConfigurator.Configure();
+            builder.Services.AddSingleton(TypeAdapterConfig.GlobalSettings);
+            builder.Services.AddScoped<IMapper, ServiceMapper>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

@@ -1,9 +1,11 @@
 ﻿using b.demo.database;
 using b.demo.database.Models;
 using b.Server.Dtos;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace b.Server.Controllers
 {
@@ -12,26 +14,21 @@ namespace b.Server.Controllers
     public class ProductController : ControllerBase
     {
         private readonly CoreDbContext coreDbContext;
+        private readonly IMapper mapper;
 
-        public ProductController(CoreDbContext coreDbContext)
+        public ProductController(CoreDbContext coreDbContext, IMapper mapper)
         {
             this.coreDbContext = coreDbContext;
+            this.mapper = mapper;
         }
 
-        Func<Product, ProductDto> mapProductToDto = p => new ProductDto
-        {
-            Id = p.Id,
-            Name = p.Name,
-            Description = p.Description,
-            Price = p.Price,
-        };
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDto>>> GetAll()
         {
             var products = await coreDbContext.Products.ToListAsync();
 
-            var mapped = products.Select(mapProductToDto);
+            var mapped = mapper.Map<List<ProductDto>>(products);
 
             return Ok(mapped);
         }
@@ -46,24 +43,16 @@ namespace b.Server.Controllers
                 return NotFound();
             }
 
-            var mapped = mapProductToDto(product);
+            var mapped = mapper.Map<List<ProductDto>>(product); ;
 
             return Ok(mapped); 
         }
-
-        Func<ProductDto, Product> mapProductDtoToProduct = p => new Product
-        {
-            Id = p.Id,
-            Name = p.Name,
-            Description = p.Description,
-            Price = p.Price,
-        };
 
         [HttpPost]
         [Authorize(Roles = BuiltInRoles.Admin)]
         public async Task<ActionResult<Product>> Post(ProductDto product)
         {
-            var mapped = mapProductDtoToProduct(product);
+            var mapped = mapper.Map<Product>(product);
 
             await coreDbContext.Products.AddAsync(mapped);
             await coreDbContext.SaveChangesAsync();
@@ -98,6 +87,13 @@ namespace b.Server.Controllers
             {
                 return NotFound();
             }
+
+            var mapped=mapper.Map<Product>(product);
+
+            coreDbContext
+                .Entry(existingProduct)
+                .CurrentValues
+                .SetValues(mapped);
 
             existingProduct.Name = product.Name;
             existingProduct.Description = product.Description;
